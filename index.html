@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.2.1/dist/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
+    <link rel="stylesheet" href="style.css" type="text/css">
+</head>
+<body>
+    <div class="container">
+        <h1>Weather App</h1>
+        <table class="centerContainer1">
+            <tr>
+                <td>
+                    <label id="cityLabel" for="cityNameTextField" style="color: black; ">Enter a city:</label>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <input id="cityNameTextField"type="text" class="form-control" name="cityName"/>
+                    <input id="submitbutton" type="button" class="tombol btn btn-primary btn-sm" value="Search" onclick="submitAction()"/>
+                </td>
+            </tr>
+        </table>
+        <div class="spacer"></div>
+            <div
+                id="errorMessageComponent"
+                style="display: none; color: #fc574e;"
+            ></div>
+        <div>
+            <div id="loader" style="display: none;" class="spinner spinner-border" role="status">
+                <span class="sr-only">Loading...</span>
+            </div>
+        </div>
+        <div id="weatherInfoComponent" style="display: none;">
+            <table class="centerContainer2 table table-borderless">
+                <tr>
+                    <th>Weather</th>
+                    <td id = "weatherField" class="td1">0</td>
+                </tr>
+                <tr>
+                    <th>Temperature</th>
+                    <td id = "temperatureField" class="td1">0</td>
+                </tr>
+                <tr>
+                    <th>Feels like</th>
+                    <td id="feelsLikeField" class="td1">0</td>
+                </tr>
+                <tr>
+                    <th>Humidity</th>
+                    <td id="humidityField" class="td1">0</td>
+                </tr>
+                <tr>
+                    <th>Atmospheric Pressure</th>
+                    <td id="pressureField" class="td1">0</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.6/dist/umd/popper.min.js" integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.2.1/dist/js/bootstrap.min.js" integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k" crossorigin="anonymous"></script>
+    
+    <script>
+        // jQuery Syntax
+        const cityElementJquery = $("#cityNameTextField");
+
+        // ESS function
+        async function submitAction(){
+            $("#errorMessageComponent").css("display", "none");
+            $("#loader").css("display", "block");
+            $("#errorMessageComponent").html("");
+            console.log(cityElementJquery.val());
+            const APIKEY = "596d72d145a425eab98ef6c47fea88b7";
+            const cityName = cityElementJquery.val();
+            const url = `https://api.openweathermap.org/data/2.5/weather?q=${cityName}&appid=${APIKEY}&units=metric`;
+            const response = await fetch(url);
+
+            // Response handling - success and error
+            if (response.status === 200){
+                console.log("Request success");
+                const weatherData = await response.json();
+                // Call the setWeatherImage function with the weather condition
+                setWeatherImage(weatherData.weather[0].main);
+                $("#weatherField").html(weatherData.weather[0].main);
+                $("#temperatureField").html(weatherData.main.temp);
+                $("#feelsLikeField").html(weatherData.main.feels_like);
+                $("#humidityField").html(weatherData.main.humidity);
+                $("#pressureField").html(weatherData.main.pressure);
+                $("#loader").css("display", "none");
+                $("#weatherInfoComponent").css("display", "block");
+            } else if (response.status === 404){
+                // city not found handling
+                $("#weatherInfoComponent").css("display", "none");
+                $("#errorMessageComponent").css("display", "block");
+                $("#loader").css("display", "none");
+                $("#errorMessageComponent").html("Invalid City");
+            } else {
+                console.log(response.status);
+            }
+        }
+
+        function setWeatherImage(weatherCondition) {
+            const weatherImgElement = $("body");
+            let imageUrl = "";
+
+            switch (weatherCondition) {
+                case "Clear":
+                    imageUrl = "assets/images/clear.jpg";
+                    break;
+                case "Rain":
+                    imageUrl = "assets/images/rain.jpg";
+                    break;
+                case "Drizzle":
+                    imageUrl = "assets/images/drizzle.jpg";
+                    break;
+                case "Clouds":
+                    imageUrl = "assets/images/clouds.jpg";
+                    break;
+                case "Haze":
+                    imageUrl = "assets/images/haze.jpg";
+                    break;
+                case "Thunderstorm":
+                    imageUrl = "assets/images/thunder.jpg";
+                    break;
+                case "Snow":
+                    imageUrl = "assets/images/snow.jpg";
+                    break;
+                default:
+                    imageUrl = "assets/images/default.jpg";
+                    break;
+            }
+
+            // Set the background image of the body element
+            weatherImgElement.css("background-image", `url(${imageUrl})`);
+        }
+    </script>
+</body>
+</html>
