@@ -73,7 +73,7 @@
             $("#loader").css("display", "block");
             $("#errorMessageComponent").html("");
             console.log(cityElementJquery.val());
-            const APIKEY = "596d72d145a425eab98ef6c47fea88b7";
+            const APIKEY = "YOUR_API_KEY";
             const cityName = cityElementJquery.val();
             const url = `https://api.openweathermap.org/data/2.5/weather?q=${cityName}&appid=${APIKEY}&units=metric`;
             const response = await fetch(url);
